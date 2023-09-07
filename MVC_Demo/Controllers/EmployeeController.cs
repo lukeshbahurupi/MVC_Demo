@@ -26,17 +26,17 @@ namespace MVC_Demo.Controllers
             return View();
         }
         [HttpPost]
-        public ActionResult Create(Employee value)
+        public ActionResult Create(FormCollection value)
         {
-            //Employee employee = new Employee()
-            //{
-            //    Name = value["Name"],
-            //    Gender = value["Gender"],
-            //    City  = value["City"],
-            //    Salary = Convert.ToDecimal(value["Salary"]),
-            //    DateOfBirth = Convert.ToDateTime(value["DateOfBirth"])               
-            //};
-            Method.AddEmployee(value);
+            Employee employee = new Employee()
+            {
+                Name = value["Name"],
+                Gender = value["Gender"],
+                City  = value["City"],
+                Salary = Convert.ToDecimal(value["Salary"]),
+                DateOfBirth = Convert.ToDateTime(value["DateOfBirth"])               
+            };
+            Method.AddEmployee(employee);
             return RedirectToAction("Index");
         }
     }
