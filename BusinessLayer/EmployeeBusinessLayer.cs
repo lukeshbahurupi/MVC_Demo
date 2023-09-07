@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Configuration;
+using System.Xml.Linq;
 
 namespace BusinessLayer
 {
@@ -48,6 +49,56 @@ namespace BusinessLayer
             }
             //Return the list of employees that is stored in the list collection of employees
             return employees;
+        }
+
+        public void AddEmployee(Employee employee)
+        {
+            string connectionString = ConfigurationManager.ConnectionStrings["DBCS"].ConnectionString;
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand cmd = new SqlCommand("spAddEmployee", connection)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                //@Name, @Gender, @City,@Salary, @DateOfBirth
+                SqlParameter parameterName = new SqlParameter
+                {
+                    ParameterName = "@Name",
+                    Value = employee.Name
+                };                
+                SqlParameter parameterGender = new SqlParameter
+                {
+                    ParameterName = "@Gender",
+                    Value = employee.Gender
+                };                
+                SqlParameter parameterCity = new SqlParameter
+                {
+                    ParameterName = "@City",
+                    Value = employee.City
+                };                
+                SqlParameter parameterSalary = new SqlParameter
+                {
+                    ParameterName = "@Salary",
+                    Value = employee.Salary
+                };
+                SqlParameter parameterDateOfBirth = new SqlParameter
+                {
+                    ParameterName = "@DateOfBirth",
+                    Value = employee.DateOfBirth
+                };
+
+                cmd.Parameters.Add(parameterName);
+                cmd.Parameters.Add(parameterGender);
+                cmd.Parameters.Add(parameterCity);
+                cmd.Parameters.Add(parameterSalary);
+                cmd.Parameters.Add(parameterDateOfBirth);
+
+                connection.Open();
+                cmd.ExecuteNonQuery();
+
+            }
         }
     }
 }

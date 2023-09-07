@@ -9,12 +9,35 @@ namespace MVC_Demo.Controllers
 {
     public class EmployeeController : Controller
     {
+        public EmployeeBusinessLayer Method { get; set; }
+        public EmployeeController()
+        {
+            Method = new EmployeeBusinessLayer();
+        }
         // GET: Employee
         public ActionResult Index()
-        {
-            EmployeeBusinessLayer employeeBusinessLayer = new EmployeeBusinessLayer();
-            List<Employee> employees = employeeBusinessLayer.GetAllEmployess();
+        {           
+            List<Employee> employees = Method.GetAllEmployess();
             return View(employees);
+        }
+        [HttpGet]
+        public ActionResult Create()
+        {           
+            return View();
+        }
+        [HttpPost]
+        public ActionResult Create(Employee value)
+        {
+            //Employee employee = new Employee()
+            //{
+            //    Name = value["Name"],
+            //    Gender = value["Gender"],
+            //    City  = value["City"],
+            //    Salary = Convert.ToDecimal(value["Salary"]),
+            //    DateOfBirth = Convert.ToDateTime(value["DateOfBirth"])               
+            //};
+            Method.AddEmployee(value);
+            return RedirectToAction("Index");
         }
     }
 }
