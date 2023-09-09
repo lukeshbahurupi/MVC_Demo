@@ -21,23 +21,73 @@ namespace MVC_Demo.Controllers
             return View(employees);
         }
         [HttpGet]
-        public ActionResult Create()
+        [ActionName("Create")]
+        public ActionResult Create_Get()
         {           
             return View();
         }
         [HttpPost]
-        public ActionResult Create(FormCollection value)
+        [ActionName("Create")]
+        public ActionResult Create_Post(Employee employee)
         {
-            Employee employee = new Employee()
+
+            #region 
+            //Employee employee = new Employee()
+            //{
+            //    Name = value["Name"],
+            //    Gender = value["Gender"],
+            //    City = value["City"],
+            //    Salary = Convert.ToDecimal(value["Salary"]),
+            //    DateOfBirth = Convert.ToDateTime(value["DateOfBirth"])
+            //};
+            #endregion
+            //Employee employee = new Employee();
+
+            //TryUpdateModel<Employee>(employee);
+            if (ModelState.IsValid)
             {
-                Name = value["Name"],
-                Gender = value["Gender"],
-                City  = value["City"],
-                Salary = Convert.ToDecimal(value["Salary"]),
-                DateOfBirth = Convert.ToDateTime(value["DateOfBirth"])               
-            };
-            Method.AddEmployee(employee);
-            return RedirectToAction("Index");
+                Method.AddEmployee(employee);
+                return RedirectToAction("Index");
+            }
+            return View();
+        }
+
+        public ActionResult Edit(int? id)
+        {
+            Employee employee = Method.GetAllEmployess().FirstOrDefault(el => el.ID == id);
+            return View(employee);
+        }
+        [HttpPost]
+        public ActionResult Edit(Employee value)
+        {
+            if (ModelState.IsValid)
+            {
+                //Employee value = new Employee();
+
+                //UpdateModel<Employee>(value,new string[] {"Name"});//include
+                //UpdateModel<Employee>(value,null,null,new string[] {"Name"});//exclude
+
+                Method.UpdateEmployee(value);
+                return RedirectToAction("Index");
+            }
+            return View();
+            }
+
+        public ActionResult Details(int id)
+        {
+            return View(Method.GetEmployeeDetails(id));
+            //return View(Method.GetAllEmployess().FirstOrDefault(el => el.ID == id));
+        }
+
+        public  ActionResult Delete(int id)
+        {           
+            return View(Method.GetEmployeeDetails(id));          
+        }
+        
+        public  ActionResult GetDelete(int id)
+        {
+            Method.DeleteEmployee(id);
+            return RedirectToAction("Index");          
         }
     }
 }

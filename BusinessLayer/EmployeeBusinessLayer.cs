@@ -12,10 +12,16 @@ namespace BusinessLayer
 {
     public class EmployeeBusinessLayer
     {
+        private string connectionString { get; }
+        //private Employee employee { get; set; }
+        public EmployeeBusinessLayer()
+        {
+            connectionString = ConfigurationManager.ConnectionStrings["DBCS"].ConnectionString;            
+        }
         public List<Employee> GetAllEmployess()
         {
             //Reads the connection string from web.config file. The connection string name is DBCS
-            string connectionString = ConfigurationManager.ConnectionStrings["DBCS"].ConnectionString;
+            //string connectionString = ConfigurationManager.ConnectionStrings["DBCS"].ConnectionString;
             //Create List of employees collection object which can store list of employees
             List<Employee> employees = new List<Employee>();
             //Establish the Connection to the database
@@ -53,7 +59,6 @@ namespace BusinessLayer
 
         public void AddEmployee(Employee employee)
         {
-            string connectionString = ConfigurationManager.ConnectionStrings["DBCS"].ConnectionString;
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -100,5 +105,111 @@ namespace BusinessLayer
 
             }
         }
+
+        public void UpdateEmployee(Employee employee)
+        {
+            using(SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand cmd = new SqlCommand("spUpdateEmployee", connection)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                SqlParameter Id = new SqlParameter
+                {
+                    ParameterName = "@Id",
+                    Value = employee.ID                    
+                };
+                SqlParameter Name = new SqlParameter
+                {
+                    ParameterName = "@Name",
+                    Value = employee.Name                    
+                };
+                SqlParameter Gender = new SqlParameter
+                {
+                    ParameterName = "@Gender",
+                    Value = employee.Gender                    
+                };
+                SqlParameter Salary = new SqlParameter
+                {
+                    ParameterName = "@Salary",
+                    Value = employee.Salary
+                };
+                SqlParameter DateOfBirh = new SqlParameter
+                {
+                    ParameterName = "@DateOfBirth",
+                    Value = employee.DateOfBirth                    
+                };
+                SqlParameter City = new SqlParameter
+                {
+                    ParameterName = "@City",
+                    Value = employee.City                   
+                };
+                cmd.Parameters.Add(Id);
+                cmd.Parameters.Add(Name);
+                cmd.Parameters.Add(Gender);
+                cmd.Parameters.Add(Salary);
+                cmd.Parameters.Add(City);
+                cmd.Parameters.Add(DateOfBirh);
+                connection.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public void DeleteEmployee(int id)
+        {
+            using(SqlConnection connection = new SqlConnection(connectionString))
+            {
+                
+                SqlCommand cmd = new SqlCommand("spDeleteEmployee", connection) 
+                { 
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                SqlParameter Id = new SqlParameter
+                {
+                    ParameterName = "@Id", Value = id
+                };
+
+                cmd.Parameters.Add(Id);
+                connection.Open();
+                cmd.ExecuteNonQuery();
+
+            }
+        }
+
+        public Employee GetEmployeeDetails(int id)
+        {
+            
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                Employee  employee = new Employee();
+                SqlCommand cmd = new SqlCommand("spEmployeeDetails", connection)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+                SqlParameter Id = new SqlParameter
+                {
+                    ParameterName = "@id",
+                    Value = id
+                };
+                cmd.Parameters.Add(Id);
+                connection.Open();
+                SqlDataReader rdr = cmd.ExecuteReader();
+                while (rdr.Read())
+                {
+                    //Creating the employee object to store employee information                    
+                    employee.ID = Convert.ToInt32(rdr["EmployeeId"]);
+                    employee.Name = rdr["Name"].ToString();
+                    employee.Gender = rdr["Gender"].ToString();
+                    employee.City = rdr["City"].ToString();
+                    employee.Salary = Convert.ToDecimal(rdr["Salary"]);
+                    employee.DateOfBirth = Convert.ToDateTime(rdr["DateOfBirth"]);
+                    //Adding that employee into List of employees collection object                    
+                }
+                return employee;
+            }
+        }
+
     }
 }
